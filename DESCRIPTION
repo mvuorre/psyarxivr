@@ -1,11 +1,10 @@
 Package: osfdata
-Title: What the Package Does (One Line, Title Case)
+Title: OSF Preprints data
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Authors@R:
+    person("Matti", "Vuorre", , "mjvuorre@uvt.nl", role = c("aut", "cre"))
+Description: Convenient access to wrangled preprint data from the Open Science Framework.
+License: MIT
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
