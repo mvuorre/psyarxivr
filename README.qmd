@@ -1,0 +1,63 @@
+---
+format: gfm
+---
+
+<!-- README.md is generated from README.qmd. Please edit that file -->
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  dev = "ragg_png",
+  dpi = 200
+)
+```
+
+# psyarxivdbr
+
+psyarxivdbr is a poorly named R package that provides access to [PsyArXiv](https://osf.io/preprints/psyarxiv) preprint metadata within R. The data is sourced from the [Open Science Framework](https://osf.io/) API, and is updated monthly.
+
+## Install
+
+Install psyarxivdbr from [GitHub](https://github.com/mvuorre/psyarxivdbr):
+
+```r
+# install.packages("pak")
+pak::pkg_install("mvuorre/psyarxivdbr")
+```
+
+## Use
+
+```{r}
+#| results: hide
+#| message: false
+
+library(psyarxivdbr)
+library(tidyverse) # Data wrangling
+library(knitr) # Table display
+```
+
+The package provides a single table of preprint metadata called `preprints`. Here's what the data look like (see `?preprints`):
+
+```{r}
+glimpse(preprints)
+```
+
+### Example: Preprints over time
+
+As an example, we tabulate the number of preprints created per year.
+
+```{r}
+#| label: tbl-year
+#| tbl-cap: Yearly new PsyArXiv preprints.
+
+preprints |>
+  mutate(
+    year = floor_date(date_created, unit = "year") |> str_sub(1, 4)
+  ) |>
+  count(year) |>
+  pivot_wider(names_from = year, values_from = n) |>
+  kable()
+```

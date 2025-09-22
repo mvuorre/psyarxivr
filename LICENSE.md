@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2025 osfdata authors
+Copyright (c) 2025 psyarxivdbr authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

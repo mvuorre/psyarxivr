@@ -1,3 +1,14 @@
-^osfdata\.Rproj$
-^\.Rproj\.user$
 ^LICENSE\.md$
+^data-raw$
+^README\.qmd$
+^Makefile$
+^.Renviron.example$
+^.Renviron$
+^.github$
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
+^vignettes/articles$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
