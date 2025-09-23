@@ -7,12 +7,12 @@
 psyarxivr is an R package that provides access to
 [PsyArXiv](https://osf.io/preprints/psyarxiv) preprint metadata within
 R. The data is sourced from the [Open Science
-Framework](https://osf.io/) API, and is updated monthly.
+Framework](https://osf.io/) API (via
+<https://github.com/mvuorre/psyarxivdb>), and is updated monthly.
 
 ## Install
 
-Install psyarxivr from
-[GitHub](https://github.com/mvuorre/psyarxivr):
+Install psyarxivr from [GitHub](https://github.com/mvuorre/psyarxivr):
 
 ``` r
 # install.packages("pak")
@@ -90,3 +90,156 @@ Table 1: Yearly new PsyArXiv preprints.
 </div>
 
 </div>
+
+## Data structure
+
+See `?preprints` for details on the variables. Below, I explain the
+three JSON variables `contributors`, `subjects`, and `tags`, with
+examples on how to work with them.
+
+### Contributors
+
+The `contributors` variable contains a JSON array of preprints’ authors.
+In R, this data structure is perhaps easiest to work with as tables
+inside a
+[list-column](https://r4ds.hadley.nz/rectangling.html#list-columns),
+which can then be
+[unnested](https://tidyr.tidyverse.org/reference/unnest.html):
+
+``` r
+set.seed(999)
+library(jsonlite)
+#> 
+#> Attaching package: 'jsonlite'
+#> The following object is masked from 'package:purrr':
+#> 
+#>     flatten
+
+preprints |>
+  select(id, contributors) |>
+  slice_sample(n = 2) |>
+  mutate(
+    contributors = map(contributors, fromJSON)
+  ) |>
+  unnest(contributors)
+#> # A tibble: 9 × 7
+#>   id       full_name            given_name family_name orcid index bibliographic
+#>   <chr>    <chr>                <chr>      <chr>       <chr> <int> <lgl>        
+#> 1 vc7a6_v1 Olena Didenko        Olena      Didenko      <NA>     0 TRUE         
+#> 2 vc7a6_v1 Sandra Tan           Sandra     Tan          <NA>     1 TRUE         
+#> 3 vc7a6_v1 Huriye Atilgan       Huriye     Atilgan      <NA>     2 TRUE         
+#> 4 vc7a6_v1 Armin Lak            Armin      Lak         "000…     3 TRUE         
+#> 5 frcks_v1 Lucian Gideon Conwa… Lucian     Conway      ""        0 TRUE         
+#> 6 frcks_v1 Alivia Zubrod        Alivia     Zubrod       <NA>     1 TRUE         
+#> 7 frcks_v1 Linus Chan           Linus      Chan        ""        2 TRUE         
+#> 8 frcks_v1 James D.McFarland    James      McFarland    <NA>     3 TRUE         
+#> 9 frcks_v1 Evert Van de Vliert  Evert      Van de Vli… "000…     4 TRUE
+```
+
+These data allow rich analyses of, for example, coauthor networks.
+
+### Subjects
+
+The `subjects` variable is a JSON array of arrays. This data format
+directly follows from the [OSF
+API](https://developer.osf.io/#tag/Preprints). In R, the JSON is
+converted into a list of data frames, where each indicates a hierarchy
+such as “Social and Behavioral Sciences \> Social and Personality
+Psychology”. The first row in each data frame indicates the top-level
+OSF subject, and the bottom row the smallest sub-category. Thus, the
+top-level categories can be duplicated for each preprint. For example:
+
+``` r
+fromJSON(preprints$subjects[[1]])
+#> [[1]]
+#>                         id                              text
+#> 1 5b4e7425c6983001430b6c1e    Social and Behavioral Sciences
+#> 2 5b4e7425c6983001430b6c34 Social and Personality Psychology
+#> 
+#> [[2]]
+#>                         id                           text
+#> 1 5b4e7425c6983001430b6c1e Social and Behavioral Sciences
+#> 2 5b4e7426c6983001430b6c45              Psychology, other
+```
+
+One way to flatten this variable is to create a wide-format table of
+subjects at different levels (the maximum at PsyArXiv is three) for each
+preprint:
+
+``` r
+# Table with a list column of lists of subject tables
+subjects <- preprints |>
+  select(preprint = id, subjects) |>
+  mutate(
+    subjects_list = map(subjects, ~ fromJSON(.x)),
+    preprint_row = row_number()
+  ) |>
+  select(-subjects)
+
+# Unnest all subjects from all preprints with indices
+subjects <- subjects |>
+  unnest(subjects_list) |>
+  mutate(subject_index = row_number(), .by = c(preprint, preprint_row)) |>
+  unnest(subjects_list) |>
+  mutate(level = row_number(), .by = c(preprint, subject_index))
+
+# Pivot to wide format so each preprint-subject has a unique row
+subjects <- subjects |>
+  select(preprint, subject_index, level, text) |>
+  pivot_wider(
+    names_from = level,
+    values_from = text,
+    names_prefix = "level_"
+  )
+```
+
+This is becoming somewhat abstract, so a plot of category counts might
+illustrate. Read the code below at your own peril.
+
+``` r
+library(patchwork)
+subjects_count <- subjects |>
+  count(level_1, level_2, level_3, sort = TRUE) |>
+  mutate(
+    level_2 = replace_na(level_2, "None"),
+    level_3 = replace_na(level_3, "None")
+  )
+p1 <- subjects_count |>
+  summarise(n = sum(n), .by = level_1) |>
+  mutate(level_1 = fct_reorder(level_1, n)) |>
+  ggplot(aes(n, level_1)) +
+  geom_point() +
+  labs(title = "Level 1 subjects")
+
+p2 <- subjects_count |>
+  filter(level_1 == "Social and Behavioral Sciences") |>
+  summarise(n = sum(n), .by = level_2) |>
+  mutate(level_2 = fct_reorder(level_2, n)) |>
+  ggplot(aes(n, level_2)) +
+  geom_point() +
+  labs(
+    title = "Level 2 subjects",
+    subtitle = "Social and Behavioral Sciences"
+  )
+
+p3 <- subjects_count |>
+  filter(
+    level_1 == "Social and Behavioral Sciences",
+    level_2 == "Social and Personality Psychology"
+  ) |>
+  summarise(n = sum(n), .by = level_3) |>
+  mutate(level_3 = fct_reorder(level_3, n)) |>
+  ggplot(aes(n, level_3)) +
+  geom_point() +
+  labs(
+    title = "Level 3 subjects",
+    subtitle = "Social and Behavioral Sciences\n > Social and Personality Psychology"
+  )
+
+(p1 / p2 / p3) +
+  plot_layout(heights = c(12, 44, 64), axes = "collect") &
+  scale_x_continuous("Count") &
+  theme(axis.title.y = element_blank())
+```
+
+![](man/figures/README-unnamed-chunk-7-1.png)

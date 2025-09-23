@@ -1,2 +1,2 @@
 # URL of data dump
-REMOTE_DUMP_URL="user@ip:/path/to/preprints.csv.gz"
+REMOTE_DUMP_URL="https://url.to/data.csv.gz"
