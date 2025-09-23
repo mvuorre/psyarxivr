@@ -1,8 +1,8 @@
 # Run this with `make`
-all: man/psyarxivdbr-package.Rd README.md
+all: man/psyarxivr-package.Rd README.md
 
 # Create R documentation
-man/psyarxivdbr-package.Rd: R/data.R R/psyarxivdbr-package.R DESCRIPTION NAMESPACE
+man/psyarxivr-package.Rd: R/data.R R/psyarxivr-package.R DESCRIPTION NAMESPACE
 	Rscript -e "devtools::document()"
 
 # Render README.md

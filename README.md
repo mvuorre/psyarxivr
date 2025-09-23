@@ -2,27 +2,27 @@
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
-# psyarxivdbr
+# psyarxivr
 
-psyarxivdbr is a poorly named R package that provides access to
+psyarxivr is an R package that provides access to
 [PsyArXiv](https://osf.io/preprints/psyarxiv) preprint metadata within
 R. The data is sourced from the [Open Science
 Framework](https://osf.io/) API, and is updated monthly.
 
 ## Install
 
-Install psyarxivdbr from
-[GitHub](https://github.com/mvuorre/psyarxivdbr):
+Install psyarxivr from
+[GitHub](https://github.com/mvuorre/psyarxivr):
 
 ``` r
 # install.packages("pak")
-pak::pkg_install("mvuorre/psyarxivdbr")
+pak::pkg_install("mvuorre/psyarxivr")
 ```
 
 ## Use
 
 ``` r
-library(psyarxivdbr)
+library(psyarxivr)
 library(tidyverse) # Data wrangling
 library(knitr) # Table display
 ```
