@@ -11,6 +11,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   dev = "ragg_png",
+  cache = TRUE,
   dpi = 200
 )
 ```
@@ -71,7 +72,6 @@ See `?preprints` for details on the variables. Below, I explain the three JSON v
 The `contributors` variable contains a JSON array of preprints' authors. In R, this data structure is perhaps easiest to work with as tables inside a [list-column](https://r4ds.hadley.nz/rectangling.html#list-columns), which can then be [unnested](https://tidyr.tidyverse.org/reference/unnest.html):
 
 ```{r}
-set.seed(999)
 library(jsonlite)
 
 preprints |>
@@ -127,6 +127,7 @@ This is becoming somewhat abstract, so a plot of category counts might illustrat
 ```{r}
 #| fig-height: 12
 
+set.seed(999)
 library(patchwork)
 subjects_count <- subjects |>
   count(level_1, level_2, level_3, sort = TRUE) |>
@@ -171,3 +172,12 @@ p3 <- subjects_count |>
   scale_x_continuous("Count") &
   theme(axis.title.y = element_blank())
 ```
+
+# Development
+
+To update the data while keeping repo size small:
+
+1. Remove data file from git history: `git filter-repo --path data/preprints.rda --invert-paths --force`
+2. Clean up git storage: `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
+3. Remove LFS objects (if any): `git lfs prune --force`
+4. Add updated data and commit normally

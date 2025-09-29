@@ -32,7 +32,7 @@ The package provides a single table of preprint metadata called
 
 ``` r
 glimpse(preprints)
-#> Rows: 50,146
+#> Rows: 50,179
 #> Columns: 27
 #> $ id                             <chr> "25pnr_v1", "266vp_v1", "27b43_v1", "2q…
 #> $ title                          <chr> "Adapting a Revised Child Anxiety and D…
@@ -85,7 +85,7 @@ Table 1: Yearly new PsyArXiv preprints.
 
 | 2016 | 2017 | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 |  2025 |
 |-----:|-----:|-----:|-----:|-----:|-----:|-----:|-----:|-----:|------:|
-|  187 |  992 | 2354 | 3583 | 6229 | 6704 | 6291 | 6717 | 6688 | 10401 |
+|  187 |  992 | 2354 | 3583 | 6229 | 6704 | 6291 | 6717 | 6688 | 10434 |
 
 </div>
 
@@ -107,7 +107,6 @@ which can then be
 [unnested](https://tidyr.tidyverse.org/reference/unnest.html):
 
 ``` r
-set.seed(999)
 library(jsonlite)
 #> 
 #> Attaching package: 'jsonlite'
@@ -122,18 +121,12 @@ preprints |>
     contributors = map(contributors, fromJSON)
   ) |>
   unnest(contributors)
-#> # A tibble: 9 × 7
-#>   id       full_name            given_name family_name orcid index bibliographic
-#>   <chr>    <chr>                <chr>      <chr>       <chr> <int> <lgl>        
-#> 1 vc7a6_v1 Olena Didenko        Olena      Didenko      <NA>     0 TRUE         
-#> 2 vc7a6_v1 Sandra Tan           Sandra     Tan          <NA>     1 TRUE         
-#> 3 vc7a6_v1 Huriye Atilgan       Huriye     Atilgan      <NA>     2 TRUE         
-#> 4 vc7a6_v1 Armin Lak            Armin      Lak         "000…     3 TRUE         
-#> 5 frcks_v1 Lucian Gideon Conwa… Lucian     Conway      ""        0 TRUE         
-#> 6 frcks_v1 Alivia Zubrod        Alivia     Zubrod       <NA>     1 TRUE         
-#> 7 frcks_v1 Linus Chan           Linus      Chan        ""        2 TRUE         
-#> 8 frcks_v1 James D.McFarland    James      McFarland    <NA>     3 TRUE         
-#> 9 frcks_v1 Evert Van de Vliert  Evert      Van de Vli… "000…     4 TRUE
+#> # A tibble: 3 × 5
+#>   id       full_name                      date_registered    index bibliographic
+#>   <chr>    <chr>                          <chr>              <int> <lgl>        
+#> 1 8ec5r_v1 Joaquin Matias Alfei Palloni   2016-01-20T13:36:…     0 TRUE         
+#> 2 em29z_v1 Catherine Pressimone Beckowski 2024-04-04T23:54:…     0 TRUE         
+#> 3 em29z_v1 Benjamin M. Torsney            2019-11-03T15:17:…     1 TRUE
 ```
 
 These data allow rich analyses of, for example, coauthor networks.
@@ -197,6 +190,7 @@ This is becoming somewhat abstract, so a plot of category counts might
 illustrate. Read the code below at your own peril.
 
 ``` r
+set.seed(999)
 library(patchwork)
 subjects_count <- subjects |>
   count(level_1, level_2, level_3, sort = TRUE) |>
@@ -243,3 +237,14 @@ p3 <- subjects_count |>
 ```
 
 ![](man/figures/README-unnamed-chunk-7-1.png)
+
+# Development
+
+To update the data while keeping repo size small:
+
+1.  Remove data file from git history:
+    `git filter-repo --path data/preprints.rda --invert-paths --force`
+2.  Clean up git storage:
+    `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
+3.  Remove LFS objects (if any): `git lfs prune --force`
+4.  Add updated data and commit normally
