@@ -240,11 +240,15 @@ p3 <- subjects_count |>
 
 # Development
 
-To update the data while keeping repo size small:
+Standard Git + GitHub, but to keep the repo size small we don’t need to
+track the history of the raw data object. We therefore just delete it
+from git history periodically:
 
 1.  Remove data file from git history:
     `git filter-repo --path data/preprints.rda --invert-paths --force`
 2.  Clean up git storage:
     `git reflog expire --expire=now --all && git gc --prune=now --aggressive`
-3.  Remove LFS objects (if any): `git lfs prune --force`
+3.  Re-add origin remote:
+    `git remote add origin https://github.com/mvuorre/psyarxivr.git`
 4.  Add updated data and commit normally
+5.  Push with upstream: `git push --set-upstream origin main --force`
