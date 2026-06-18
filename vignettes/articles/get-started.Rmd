@@ -15,45 +15,36 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-if (interactive()) {
-  devtools::load_all()
-} else {
-  library(psyarxivr)
-}
+library(tidyverse) # Data wrangling
+library(knitr) # Table display
+library(psyarxivr)
 ```
 
 ## Use
 
-The package includes a small example dataset, `preprints_sample`. `get_preprints()` downloads the full dataset the first time it is called.
+The package includes a small example dataset, `preprints_sample`. `get_preprints()` downloads and stores the full dataset the first time it is called.
 
 ```{r}
 #| eval: false
 preprints <- get_preprints()
 ```
 
-`get_preprints()` stores the downloaded file in `tools::R_user_dir("psyarxivr", "data")` and reuses that local cache on later calls. Use `get_preprints(refresh = TRUE)` or `update_preprints()` to download the current GitHub release asset again.
+`get_preprints()` stores the downloaded file in `tools::R_user_dir("psyarxivr", "data")` and reuses that local cache on later calls. Use `get_preprints(refresh = TRUE)` to download the current GitHub release asset again.
 
 Here's what the bundled sample data look like (see `?preprints_sample`):
 
 ```{r}
-glimpse(preprints_sample)
+head(preprints)
 ```
 
 ### Example: Preprints over time
-
-```{r}
-#| results: hide
-#| message: false
-library(tidyverse) # Data wrangling
-library(knitr) # Table display
-```
 
 As an example, we tabulate the number of preprints created per year. Use `get_preprints()` first to run this on the full dataset.
 
 ```{r}
 #| label: tbl-year
 #| tbl-cap: Yearly new PsyArXiv preprints in the bundled sample.
-preprints_sample |>
+preprints |>
   mutate(
     year = floor_date(date_created, unit = "year") |> str_sub(1, 4)
   ) |>
@@ -73,7 +64,7 @@ The `contributors` variable contains a JSON array of preprints' authors. In R, t
 ```{r}
 library(jsonlite)
 
-preprints_sample |>
+preprints |>
   select(id, contributors) |>
   slice_head(n = 2) |>
   mutate(
@@ -89,14 +80,14 @@ These data allow rich analyses of, for example, coauthor networks.
 The `subjects` variable is a JSON array of arrays. This data format directly follows from the [OSF API](https://developer.osf.io/#tag/Preprints). In R, the JSON is converted into a list of data frames, where each indicates a hierarchy such as "Social and Behavioral Sciences > Social and Personality Psychology". The first row in each data frame indicates the top-level OSF subject, and the bottom row the smallest sub-category. Thus, the top-level categories can be duplicated for each preprint. For example:
 
 ```{r}
-fromJSON(preprints_sample$subjects[[1]])
+fromJSON(preprints$subjects[[1]])
 ```
 
 One way to flatten this variable is to create a wide-format table of subjects at different levels (the maximum at PsyArXiv is three) for each preprint:
 
 ```{r}
 # Table with a list column of lists of subject tables
-subjects <- preprints_sample |>
+subjects <- preprints |>
   select(preprint = id, subjects) |>
   mutate(
     subjects_list = map(subjects, ~ fromJSON(.x)),

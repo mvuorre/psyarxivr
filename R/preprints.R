@@ -27,22 +27,6 @@ get_preprints <- function(
   readRDS(cache_file)
 }
 
-#' Update cached PsyArXiv preprint metadata
-#'
-#' Redownloads the full PsyArXiv preprint metadata from the package's GitHub
-#' data release and replaces the local cache.
-#'
-#' @inheritParams get_preprints
-#'
-#' @return A tibble containing full PsyArXiv preprint metadata.
-#' @export
-update_preprints <- function(
-  cache_dir = tools::R_user_dir("psyarxivr", "data"),
-  quiet = FALSE
-) {
-  get_preprints(refresh = TRUE, cache_dir = cache_dir, quiet = quiet)
-}
-
 .psyarxivr_data_asset <- "preprints.rds"
 
 .preprints_download_url <- paste0(
