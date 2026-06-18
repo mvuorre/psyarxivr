@@ -1,11 +1,13 @@
 #' @importFrom tibble tibble
 NULL
 
-#' PsyArXiv reprint metadata from the Open Science Framework.
+#' Sample PsyArXiv preprint metadata from the Open Science Framework.
 #'
-#' Preprint metadata from the Open Science Framework. All data licensed to preprint authors as indicated.
+#' A small sample of PsyArXiv preprint metadata from the Open Science
+#' Framework. Use [get_preprints()] to download and cache the full dataset.
+#' All data are licensed to preprint authors as indicated.
 #'
-#' @format A data frame with 15 variables:
+#' @format A data frame with 27 variables:
 #' \describe{
 #' \item{`id`}{Preprint identifier (chr).}
 #' \item{`title`}{Preprint title (chr).}
@@ -39,4 +41,4 @@ NULL
 #' @return a [tibble][tibble::tibble-package]
 #'
 #' For further details, see <https://developer.osf.io/#tag/Preprints>.
-"preprints"
+"preprints_sample"

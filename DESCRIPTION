@@ -1,17 +1,17 @@
 Package: psyarxivr
 Title: PsyArXiv preprints data
-Version: 0.0.0.9000
-Authors@R:
-    person(
-        given = "Matti", family = "Vuorre",
-        email = "mjvuorre@uvt.nl", role = c("aut", "cre"),
-        comment = c(ORCID = "0000-0001-5052-066X")
-    )
+Version: 0.0.1
+Authors@R: person(
+    given = "Matti",
+    family = "Vuorre",
+    email = "mjvuorre@uvt.nl",
+    role = c("aut", "cre"),
+    comment = c(ORCID = "0000-0001-5052-066X")
+  )
 Description: Convenient access to PsyArXiv preprint data from the Open Science Framework.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 URL: https://github.com/mvuorre/psyarxivr
 BugReports: https://github.com/mvuorre/psyarxivr/issues
 Depends:

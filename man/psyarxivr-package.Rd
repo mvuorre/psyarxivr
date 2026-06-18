@@ -19,5 +19,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Matti Vuorre \email{mjvuorre@uvt.nl} (\href{https://orcid.org/0000-0001-5052-066X}{ORCID})
 
+Authors:
+\itemize{
+  \item Matti Vuorre \email{mjvuorre@uvt.nl} (\href{https://orcid.org/0000-0001-5052-066X}{ORCID})
+}
+
 }
 \keyword{internal}
